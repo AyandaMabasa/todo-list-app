@@ -1,21 +1,20 @@
 const addTaskBtn = document.getElementById("add-task-btn");
 const taskInput = document.getElementById("task-input");
 const taskList = document.getElementById("task-list");
-const clearAllBtn = document.getElementById("clear-all-btn"); // New button
+const clearAllBtn = document.getElementById("clear-all-btn");
 
 addTaskBtn.addEventListener("click", () => {
   const taskText = taskInput.value.trim();
   if (taskText) {
     const li = document.createElement("li");
     li.innerHTML = `${taskText} <button class="delete-btn">Delete</button>`;
-    
     taskList.appendChild(li);
-    
+
     // Save task to localStorage
     const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
     tasks.push(taskText);
     localStorage.setItem("tasks", JSON.stringify(tasks));
-    
+
     taskInput.value = ""; // Clear input after adding
   }
 });
@@ -48,3 +47,4 @@ window.onload = () => {
     taskList.appendChild(li);
   });
 };
+
