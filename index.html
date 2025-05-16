@@ -1,45 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <!-- Enhanced viewport for better mobile handling -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
   <title>To-Do List App</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="favicon.ico" type="image/x-icon" />
-  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#4CAF50">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ToDoApp">
+  <meta name="description" content="A simple to-do list application">
+  
+  <!-- Icons -->
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="container">
     <h1>To-Do List</h1>
     
-    <!-- Added theme toggle button -->
-    <button id="theme-toggle" class="theme-btn">🌙 Dark Mode</button>
+    <button id="theme-toggle" class="theme-btn" aria-label="Toggle dark mode">🌙 Dark Mode</button>
     
     <div class="input-group">
       <input 
         type="text" 
         id="task-input" 
-        placeholder="Add a task" 
-        autofocus 
-      />
+        placeholder="Add a task"
+        aria-label="Task description"
+        autofocus
+        enterkeyhint="done"
+      >
       <input 
         type="date" 
         id="due-date-input" 
         aria-label="Due date (optional)"
-      />
-      <button id="add-task-btn">Add Task</button>
-      <button id="clear-all-btn" disabled>Clear All</button>
+      >
+      <button id="add-task-btn" aria-label="Add task">Add Task</button>
+      <button id="clear-all-btn" disabled aria-label="Clear all tasks">Clear All</button>
     </div>
     
-    <!-- Empty state placeholder -->
-    <div id="empty-state">✨ No tasks yet! Add one above.</div>
+    <div id="empty-state" aria-live="polite">✨ No tasks yet! Add one above.</div>
     
-    <!-- Task list with enhanced structure -->
-    <ul id="task-list"></ul>
+    <ul id="task-list" aria-live="polite"></ul>
   </div>
-  
-  <script src="app.js"></script>
+
+  <script src="app.js" defer></script>
 </body>
 </html>
-
