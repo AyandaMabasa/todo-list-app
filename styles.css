@@ -88,3 +88,16 @@ button.delete-btn {
 button.delete-btn:hover {
   background-color: #e53935;
 }
+
+/* Clear All Button */
+#clear-all-btn {
+  background-color: #f57c00;  /* A warm orange to stand out */
+  margin-left: 5px;
+  padding: 10px 15px;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+#clear-all-btn:hover {
+  background-color: #ef6c00;
+}
