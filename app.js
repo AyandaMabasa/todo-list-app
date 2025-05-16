@@ -7,112 +7,128 @@ const clearAllBtn = document.getElementById("clear-all-btn");
 const themeToggle = document.getElementById("theme-toggle");
 const emptyState = document.getElementById("empty-state");
 
-// Task structure: { text: string, dueDate: string, id: number }
-let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-let nextId = tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 1;
+// Task management
+let tasks = loadTasks();
+let nextId = tasks.reduce((max, task) => Math.max(max, task.id), 0) + 1;
 
 // Initialize app
 function init() {
   renderTasks();
-  updateClearAllBtn();
+  setupEventListeners();
   loadTheme();
+  taskInput.focus(); // Ensure focus on input
+}
+
+// Load tasks from localStorage
+function loadTasks() {
+  try {
+    return JSON.parse(localStorage.getItem("tasks")) || [];
+  } catch (e) {
+    console.error("Failed to load tasks", e);
+    return [];
+  }
 }
 
 // Render all tasks
 function renderTasks() {
-  taskList.innerHTML = '';
-  
   if (tasks.length === 0) {
-    emptyState.classList.remove('hidden');
+    emptyState.hidden = false;
+    taskList.innerHTML = '';
     return;
   }
-  
-  emptyState.classList.add('hidden');
-  
-  tasks.forEach(task => {
-    const li = document.createElement('li');
-    li.dataset.id = task.id;
-    li.innerHTML = `
-      <span class="task-text">${task.text}</span>
+
+  emptyState.hidden = true;
+  taskList.innerHTML = tasks.map(task => `
+    <li data-id="${task.id}">
+      <span class="task-text" tabindex="0">${escapeHTML(task.text)}</span>
       ${task.dueDate ? `<span class="due-date">${formatDate(task.dueDate)}</span>` : ''}
-      <button class="delete-btn">Delete</button>
-    `;
-    taskList.appendChild(li);
-  });
+      <button class="delete-btn" aria-label="Delete task">Delete</button>
+    </li>
+  `).join('');
+}
+
+// Event listeners
+function setupEventListeners() {
+  // Add task on button click or Enter key
+  addTaskBtn.addEventListener("click", addTask);
+  taskInput.addEventListener("keydown", (e) => e.key === 'Enter' && addTask());
+  
+  // Task actions
+  taskList.addEventListener("click", handleTaskActions);
+  
+  // Clear all with confirmation
+  clearAllBtn.addEventListener("click", clearAllTasks);
+  
+  // Theme toggle
+  themeToggle.addEventListener("click", toggleTheme);
 }
 
 // Add new task
-addTaskBtn.addEventListener("click", () => {
+function addTask() {
   const taskText = taskInput.value.trim();
-  if (taskText) {
-    const newTask = {
-      id: nextId++,
-      text: taskText,
-      dueDate: dueDateInput.value || null
-    };
-    
-    tasks.push(newTask);
-    saveTasks();
-    
-    taskInput.value = "";
-    dueDateInput.value = "";
-    renderTasks();
-    updateClearAllBtn();
-  }
-});
+  if (!taskText) return;
 
-// Handle task actions (delete/edit)
-taskList.addEventListener("click", (e) => {
+  tasks.push({
+    id: nextId++,
+    text: taskText,
+    dueDate: dueDateInput.value || null,
+    createdAt: new Date().toISOString()
+  });
+
+  saveTasks();
+  taskInput.value = "";
+  dueDateInput.value = "";
+  renderTasks();
+  taskInput.focus(); // Return focus to input
+}
+
+// Handle task actions
+function handleTaskActions(e) {
   const taskItem = e.target.closest('li');
-  const taskId = parseInt(taskItem?.dataset.id);
+  if (!taskItem) return;
+  
+  const taskId = parseInt(taskItem.dataset.id);
   
   if (e.target.classList.contains("delete-btn")) {
-    tasks = tasks.filter(task => task.id !== taskId);
-    saveTasks();
-    renderTasks();
-    updateClearAllBtn();
+    deleteTask(taskId);
   } else if (e.target.classList.contains("task-text")) {
     editTask(taskId);
   }
-});
+}
 
-// Edit task function
+// Edit task
 function editTask(id) {
   const task = tasks.find(t => t.id === id);
   const newText = prompt("Edit task:", task.text);
-  if (newText && newText.trim()) {
+  if (newText?.trim()) {
     task.text = newText.trim();
     saveTasks();
     renderTasks();
   }
 }
 
-// Clear All tasks
-clearAllBtn.addEventListener("click", () => {
-  if (confirm("Are you sure you want to clear all tasks?")) {
-    tasks = [];
-    nextId = 1;
-    saveTasks();
-    renderTasks();
-    updateClearAllBtn();
-  }
-});
-
-// Theme toggle
-themeToggle.addEventListener("click", () => {
-  document.body.classList.toggle("dark-mode");
-  const isDark = document.body.classList.contains("dark-mode");
-  themeToggle.textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
-  localStorage.setItem("theme", isDark ? "dark" : "light");
-});
-
-// Helper functions
-function updateClearAllBtn() {
-  clearAllBtn.disabled = tasks.length === 0;
+// Delete task
+function deleteTask(id) {
+  tasks = tasks.filter(task => task.id !== id);
+  saveTasks();
+  renderTasks();
 }
 
-function saveTasks() {
-  localStorage.setItem("tasks", JSON.stringify(tasks));
+// Clear all tasks
+function clearAllTasks() {
+  if (!tasks.length || !confirm("Are you sure you want to clear all tasks?")) return;
+  
+  tasks = [];
+  nextId = 1;
+  saveTasks();
+  renderTasks();
+}
+
+// Theme management
+function toggleTheme() {
+  const isDark = !document.body.classList.toggle("dark-mode");
+  themeToggle.textContent = isDark ? "🌙 Dark Mode" : "☀️ Light Mode";
+  localStorage.setItem("theme", isDark ? "light" : "dark");
 }
 
 function loadTheme() {
@@ -122,11 +138,37 @@ function loadTheme() {
   }
 }
 
+// Helper functions
+function saveTasks() {
+  try {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    updateClearAllBtn();
+  } catch (e) {
+    console.error("Failed to save tasks", e);
+  }
+}
+
+function updateClearAllBtn() {
+  clearAllBtn.disabled = tasks.length === 0;
+  clearAllBtn.title = tasks.length ? "" : "No tasks to clear";
+}
+
 function formatDate(dateString) {
   const options = { weekday: 'short', month: 'short', day: 'numeric' };
   return new Date(dateString).toLocaleDateString(undefined, options);
 }
 
-// Initialize the app
-window.addEventListener('DOMContentLoaded', init);
-    
+// Security: Prevent XSS
+function escapeHTML(str) {
+  return str.replace(/[&<>'"]/g, 
+    tag => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#39;',
+      '"': '&quot;'
+    }[tag]));
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', init);
