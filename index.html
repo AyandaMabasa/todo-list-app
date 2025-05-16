@@ -12,16 +12,34 @@
 <body>
   <div class="container">
     <h1>To-Do List</h1>
+    
+    <!-- Added theme toggle button -->
+    <button id="theme-toggle" class="theme-btn">🌙 Dark Mode</button>
+    
     <div class="input-group">
-      <input type="text" id="task-input" placeholder="Add a task" />
+      <input 
+        type="text" 
+        id="task-input" 
+        placeholder="Add a task" 
+        autofocus 
+      />
+      <input 
+        type="date" 
+        id="due-date-input" 
+        aria-label="Due date (optional)"
+      />
       <button id="add-task-btn">Add Task</button>
-      <button id="clear-all-btn">Clear All</button>
+      <button id="clear-all-btn" disabled>Clear All</button>
     </div>
+    
+    <!-- Empty state placeholder -->
+    <div id="empty-state">✨ No tasks yet! Add one above.</div>
+    
+    <!-- Task list with enhanced structure -->
     <ul id="task-list"></ul>
   </div>
+  
   <script src="app.js"></script>
 </body>
 </html>
-
-
 
