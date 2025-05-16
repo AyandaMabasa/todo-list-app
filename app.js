@@ -1,6 +1,7 @@
 const addTaskBtn = document.getElementById("add-task-btn");
 const taskInput = document.getElementById("task-input");
 const taskList = document.getElementById("task-list");
+const clearAllBtn = document.getElementById("clear-all-btn"); // New button
 
 addTaskBtn.addEventListener("click", () => {
   const taskText = taskInput.value.trim();
@@ -21,14 +22,21 @@ addTaskBtn.addEventListener("click", () => {
 
 taskList.addEventListener("click", (e) => {
   if (e.target.classList.contains("delete-btn")) {
-    e.target.parentElement.remove();
-    const taskText = e.target.parentElement.textContent.replace("Delete", "").trim();
-    
+    const taskItem = e.target.parentElement;
+    const taskText = taskItem.textContent.replace("Delete", "").trim();
+
+    taskItem.remove();
+
     // Remove task from localStorage
     let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
     tasks = tasks.filter((task) => task !== taskText);
     localStorage.setItem("tasks", JSON.stringify(tasks));
   }
+});
+
+clearAllBtn.addEventListener("click", () => {
+  taskList.innerHTML = "";
+  localStorage.removeItem("tasks");
 });
 
 // Load tasks from localStorage when page loads
