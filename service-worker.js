@@ -1,12 +1,11 @@
 const CACHE_NAME = 'todo-cache-v1';
 const urlsToCache = [
-  '/',
   '/todo-list-app/',
   '/todo-list-app/index.html',
   '/todo-list-app/styles.css',
   '/todo-list-app/app.js',
-  '/todo-list-app/icons/icon-192x192.png',
-  '/todo-list-app/icons/icon-512x512.png'
+  '/todo-list-app/icons/android-chrome-192x192.png',
+  '/todo-list-app/icons/android-chrome-512x512.png'
 ];
 
 self.addEventListener('install', event => {
@@ -21,5 +20,3 @@ self.addEventListener('fetch', event => {
       .then(response => response || fetch(event.request))
   );
 });
-
-
