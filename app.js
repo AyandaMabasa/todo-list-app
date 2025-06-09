@@ -2,6 +2,7 @@
 const addTaskBtn = document.getElementById("add-task-btn");
 const taskInput = document.getElementById("task-input");
 const dueDateInput = document.getElementById("due-date-input");
+const priorityInput = document.getElementById("priority-input");
 const taskList = document.getElementById("task-list");
 const clearAllBtn = document.getElementById("clear-all-btn");
 const themeToggle = document.getElementById("theme-toggle");
@@ -34,32 +35,42 @@ function renderTasks() {
   if (tasks.length === 0) {
     emptyState.hidden = false;
     taskList.innerHTML = '';
+    updateClearAllBtn();
     return;
   }
 
   emptyState.hidden = true;
+  // Sort tasks by priority (high > medium > low) then dueDate (earlier first)
+  const priorityRank = { high: 3, medium: 2, low: 1 };
+  tasks.sort((a, b) => {
+    if (priorityRank[b.priority] !== priorityRank[a.priority]) {
+      return priorityRank[b.priority] - priorityRank[a.priority];
+    }
+    if (a.dueDate && b.dueDate) {
+      return new Date(a.dueDate) - new Date(b.dueDate);
+    }
+    if (a.dueDate) return -1;
+    if (b.dueDate) return 1;
+    return 0;
+  });
+
   taskList.innerHTML = tasks.map(task => `
     <li data-id="${task.id}">
       <span class="task-text" tabindex="0">${escapeHTML(task.text)}</span>
-      ${task.dueDate ? `<span class="due-date">${formatDate(task.dueDate)}</span>` : ''}
+      ${task.dueDate ? `<span class="due-date">Due: ${formatDate(task.dueDate)}</span>` : ''}
+      <span class="priority ${task.priority}">${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</span>
       <button class="delete-btn" aria-label="Delete task">Delete</button>
     </li>
   `).join('');
+  updateClearAllBtn();
 }
 
 // Event listeners
 function setupEventListeners() {
-  // Add task on button click or Enter key
   addTaskBtn.addEventListener("click", addTask);
   taskInput.addEventListener("keydown", (e) => e.key === 'Enter' && addTask());
-  
-  // Task actions
   taskList.addEventListener("click", handleTaskActions);
-  
-  // Clear all with confirmation
   clearAllBtn.addEventListener("click", clearAllTasks);
-  
-  // Theme toggle
   themeToggle.addEventListener("click", toggleTheme);
 }
 
@@ -72,23 +83,25 @@ function addTask() {
     id: nextId++,
     text: taskText,
     dueDate: dueDateInput.value || null,
+    priority: priorityInput.value || 'medium',
     createdAt: new Date().toISOString()
   });
 
   saveTasks();
   taskInput.value = "";
   dueDateInput.value = "";
+  priorityInput.value = "medium";
   renderTasks();
-  taskInput.focus(); // Return focus to input
+  taskInput.focus();
 }
 
 // Handle task actions
 function handleTaskActions(e) {
   const taskItem = e.target.closest('li');
   if (!taskItem) return;
-  
+
   const taskId = parseInt(taskItem.dataset.id);
-  
+
   if (e.target.classList.contains("delete-btn")) {
     deleteTask(taskId);
   } else if (e.target.classList.contains("task-text")) {
@@ -117,7 +130,7 @@ function deleteTask(id) {
 // Clear all tasks
 function clearAllTasks() {
   if (!tasks.length || !confirm("Are you sure you want to clear all tasks?")) return;
-  
+
   tasks = [];
   nextId = 1;
   saveTasks();
@@ -138,7 +151,7 @@ function loadTheme() {
   }
 }
 
-// Helper functions
+// Helpers
 function saveTasks() {
   try {
     localStorage.setItem("tasks", JSON.stringify(tasks));
@@ -158,9 +171,8 @@ function formatDate(dateString) {
   return new Date(dateString).toLocaleDateString(undefined, options);
 }
 
-// Security: Prevent XSS
 function escapeHTML(str) {
-  return str.replace(/[&<>'"]/g, 
+  return str.replace(/[&<>'"]/g,
     tag => ({
       '&': '&amp;',
       '<': '&lt;',
@@ -170,5 +182,5 @@ function escapeHTML(str) {
     }[tag]));
 }
 
-// Initialize
+// Init app
 document.addEventListener('DOMContentLoaded', init);
