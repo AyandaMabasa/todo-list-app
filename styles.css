@@ -1,80 +1,74 @@
 body {
   font-family: Arial, sans-serif;
-  background: #f5f5f5;
+  margin: 0;
+  padding: 2rem;
+  background-color: #f0f0f0;
   color: #333;
-  transition: 0.3s;
-  margin: 20px;
+  transition: background 0.3s, color 0.3s;
 }
+
 body.dark-mode {
-  background: #121212;
-  color: #eee;
+  background-color: #121212;
+  color: #f0f0f0;
 }
+
 .container {
   max-width: 600px;
   margin: auto;
 }
-input, select {
-  padding: 8px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-}
-button {
-  padding: 8px 12px;
-  margin-left: 4px;
-  border: none;
-  border-radius: 4px;
-  background: #1976d2;
-  color: white;
-  cursor: pointer;
-  transition: 0.2s;
-}
-button:disabled {
-  background: #999;
-  cursor: not-allowed;
-}
+
 .input-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 10px;
+  margin-bottom: 20px;
 }
-#task-list li {
-  list-style: none;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: white;
+
+input, select, button {
   padding: 10px;
-  border-radius: 4px;
-  margin-bottom: 8px;
-  gap: 8px;
+  font-size: 16px;
 }
-body.dark-mode #task-list li {
-  background: #1e1e1e;
+
+#task-list {
+  list-style: none;
+  padding: 0;
 }
-.task-text {
-  flex: 1;
-  word-break: break-word;
+
+.task-item {
+  background: #e0e0e0;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
 }
-.priority, .due-date {
-  font-size: 0.9em;
-  margin-left: 8px;
+
+body.dark-mode .task-item {
+  background: #333;
 }
-.priority {
-  background: #ddd;
-  padding: 4px 8px;
-  border-radius: 4px;
+
+.task-info {
+  flex-grow: 1;
+  margin-right: 10px;
 }
-.delete-btn {
-  background: #e74c3c;
+
+.task-meta {
+  font-size: 12px;
+  color: #666;
+}
+
+button.delete-btn {
+  background-color: crimson;
+  color: white;
+  border: none;
   padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 4px;
 }
-.delete-btn:hover {
-  background: #c0392b;
-}
-#empty-state {
-  text-align: center;
-  font-style: italic;
-  color: #888;
+
+button#theme-toggle {
+  margin-bottom: 15px;
 }
 
