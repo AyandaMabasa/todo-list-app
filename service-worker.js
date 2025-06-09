@@ -1,6 +1,6 @@
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    caches.open('todo-app-cache').then((cache) => {
+    caches.open('todo-cache').then((cache) => {
       return cache.addAll([
         '/',
         '/index.html',
@@ -21,3 +21,4 @@ self.addEventListener('fetch', (e) => {
     })
   );
 });
+
