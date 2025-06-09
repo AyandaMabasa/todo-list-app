@@ -1,103 +1,137 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>To-Do List App</title>
-  <link rel="stylesheet" href="styles.css" />
-  <style>
-    body {
-      font-family: sans-serif;
-      background-color: #f0f0f0;
-      color: #333;
-      transition: background-color 0.3s, color 0.3s;
-    }
+// DOM Elements
+const addTaskBtn = document.getElementById("add-task-btn");
+const taskInput = document.getElementById("task-input");
+const dueDateInput = document.getElementById("due-date-input");
+const prioritySelect = document.getElementById("priority-input");
+const taskList = document.getElementById("task-list");
+const clearAllBtn = document.getElementById("clear-all-btn");
+const themeToggle = document.getElementById("theme-toggle");
+const emptyState = document.getElementById("empty-state");
 
-    body.dark-mode {
-      background-color: #121212;
-      color: #eee;
-    }
+// Load tasks from localStorage or initialize empty
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-    .container {
-      max-width: 600px;
-      margin: 2rem auto;
-      padding: 2rem;
-      background: #ffffff;
-      border-radius: 8px;
-    }
+// Initialize
+document.addEventListener("DOMContentLoaded", () => {
+  renderTasks();
+  updateClearAllBtn();
+  loadTheme();
+});
 
-    body.dark-mode .container {
-      background: #1e1e1e;
-    }
+// Add Task
+addTaskBtn.addEventListener("click", () => {
+  const text = taskInput.value.trim();
+  const dueDate = dueDateInput.value;
+  const priority = prioritySelect.value;
 
-    .input-group input,
-    .input-group select,
-    .input-group button {
-      margin-right: 0.5rem;
-      padding: 0.5rem;
-    }
+  if (!text) return;
 
-    .task-item {
-      margin-top: 1rem;
-      padding: 1rem;
-      border-radius: 6px;
-      background-color: #e0e0e0;
-    }
+  const task = {
+    id: Date.now(),
+    text,
+    dueDate,
+    priority,
+    completed: false,
+  };
 
-    body.dark-mode .task-item {
-      background-color: #2a2a2a;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>To-Do List</h1>
-    <button id="theme-toggle">Toggle Dark Mode</button>
+  tasks.push(task);
+  saveTasks();
+  renderTasks();
 
-    <div class="input-group">
-      <input type="text" id="task-input" placeholder="Enter a task" />
-      <input type="date" id="due-date-input" />
-      <select id="priority-input">
-        <option value="low">Low</option>
-        <option value="medium">Medium</option>
-        <option value="high">High</option>
-      </select>
-      <button id="add-task-btn">Add Task</button>
-    </div>
+  taskInput.value = "";
+  dueDateInput.value = "";
+  prioritySelect.value = "medium";
+  taskInput.focus();
+});
 
-    <ul id="task-list"></ul>
-  </div>
+// Clear All
+clearAllBtn.addEventListener("click", () => {
+  if (confirm("Clear all tasks?")) {
+    tasks = [];
+    saveTasks();
+    renderTasks();
+  }
+});
 
-  <script>
-    const addTaskBtn = document.getElementById("add-task-btn");
-    const taskInput = document.getElementById("task-input");
-    const dueDateInput = document.getElementById("due-date-input");
-    const priorityInput = document.getElementById("priority-input");
-    const taskList = document.getElementById("task-list");
-    const themeToggle = document.getElementById("theme-toggle");
+// Theme Toggle
+themeToggle.addEventListener("click", () => {
+  document.body.classList.toggle("dark-mode");
+  localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
+  themeToggle.textContent = document.body.classList.contains("dark-mode") ? "☀️ Light Mode" : "🌙 Dark Mode";
+});
 
-    addTaskBtn.addEventListener("click", () => {
-      const taskText = taskInput.value.trim();
-      const dueDate = dueDateInput.value;
-      const priority = priorityInput.value;
+// Save to localStorage
+function saveTasks() {
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  updateClearAllBtn();
+}
 
-      if (taskText === "") return;
+// Load theme
+function loadTheme() {
+  const theme = localStorage.getItem("theme");
+  if (theme === "dark") {
+    document.body.classList.add("dark-mode");
+    themeToggle.textContent = "☀️ Light Mode";
+  } else {
+    document.body.classList.remove("dark-mode");
+    themeToggle.textContent = "🌙 Dark Mode";
+  }
+}
 
-      const taskItem = document.createElement("li");
-      taskItem.className = "task-item";
-      taskItem.textContent = `${taskText} (Priority: ${priority}${dueDate ? ", Due: " + dueDate : ""})`;
+// Render tasks
+function renderTasks() {
+  taskList.innerHTML = "";
 
-      taskList.appendChild(taskItem);
-      taskInput.value = "";
-      dueDateInput.value = "";
-      priorityInput.value = "medium";
+  if (tasks.length === 0) {
+    emptyState.classList.remove("hidden");
+    return;
+  }
+
+  emptyState.classList.add("hidden");
+
+  tasks.forEach(task => {
+    const li = document.createElement("li");
+
+    const textSpan = document.createElement("span");
+    textSpan.className = "task-text";
+    textSpan.textContent = task.text;
+    if (task.completed) textSpan.style.textDecoration = "line-through";
+    textSpan.addEventListener("click", () => {
+      task.completed = !task.completed;
+      saveTasks();
+      renderTasks();
     });
 
-    themeToggle.addEventListener("click", () => {
-      document.body.classList.toggle("dark-mode");
+    const dueDateSpan = document.createElement("span");
+    dueDateSpan.className = "due-date";
+    dueDateSpan.textContent = task.dueDate ? `Due: ${task.dueDate}` : "";
+
+    const prioritySpan = document.createElement("span");
+    prioritySpan.className = "priority";
+    prioritySpan.textContent = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "delete-btn";
+    deleteBtn.textContent = "Delete";
+    deleteBtn.addEventListener("click", () => {
+      tasks = tasks.filter(t => t.id !== task.id);
+      saveTasks();
+      renderTasks();
     });
-  </script>
-</body>
-</html>
+
+    li.appendChild(textSpan);
+    li.appendChild(prioritySpan);
+    li.appendChild(dueDateSpan);
+    li.appendChild(deleteBtn);
+
+    taskList.appendChild(li);
+  });
+}
+
+// Enable or disable clear all button
+function updateClearAllBtn() {
+  clearAllBtn.disabled = tasks.length === 0;
+}
+
 
 
