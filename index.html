@@ -2,32 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>To-Do List App</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="container">
-    <h1>To‑Do List ✅</h1>
-    <button id="theme-toggle">🌙 Dark Mode</button>
-    
+    <h1>📝 To-Do List</h1>
+
+    <button id="theme-toggle">Toggle Dark Mode</button>
+
     <div class="input-group">
-      <input type="text" id="task-input" placeholder="Your task..." />
+      <input type="text" id="task-input" placeholder="Enter a task" />
       <input type="date" id="due-date-input" />
-      <select id="priority-input">
-        <option value="low">Low</option>
-        <option value="medium" selected>Medium</option>
-        <option value="high">High</option>
+      <select id="priority-select">
+        <option value="Low">Low</option>
+        <option value="Medium" selected>Medium</option>
+        <option value="High">High</option>
       </select>
-      <button id="add-task-btn">➕ Add Task</button>
-      <button id="clear-all-btn" disabled>🗑️ Clear All</button>
+      <button id="add-task-btn">Add Task</button>
     </div>
-    
+
     <ul id="task-list"></ul>
-    <div id="empty-state">No tasks yet! Add one above.</div>
+
+    <button id="clear-all-btn">Clear All Tasks</button>
   </div>
-  
-  <script src="app.js" defer></script>
+
+  <script src="app.js"></script>
 </body>
 </html>
 
