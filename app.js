@@ -8,10 +8,10 @@ const clearAllBtn = document.getElementById("clear-all-btn");
 const themeToggle = document.getElementById("theme-toggle");
 const emptyState = document.getElementById("empty-state");
 
-// Load tasks from localStorage or empty array
+// Load tasks or empty array
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-// Load theme from localStorage or default
+// Load saved theme or default light mode
 function loadTheme() {
   const darkMode = localStorage.getItem("darkMode") === "true";
   if (darkMode) {
@@ -23,17 +23,17 @@ function loadTheme() {
   }
 }
 
-// Save theme to localStorage
+// Save theme preference
 function saveTheme(darkMode) {
   localStorage.setItem("darkMode", darkMode);
 }
 
-// Save tasks to localStorage
+// Save tasks
 function saveTasks() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
-// Render tasks on the page
+// Render tasks
 function renderTasks() {
   taskList.innerHTML = "";
 
@@ -46,7 +46,7 @@ function renderTasks() {
     clearAllBtn.disabled = false;
   }
 
-  // Sort tasks: incomplete first, then by due date ascending
+  // Sort incomplete first, then by due date
   tasks.sort((a, b) => {
     if (a.completed !== b.completed) return a.completed ? 1 : -1;
     if (a.dueDate && b.dueDate) return new Date(a.dueDate) - new Date(b.dueDate);
@@ -61,13 +61,14 @@ function renderTasks() {
     const li = document.createElement("li");
     li.classList.add("task-item");
 
-    // Mark overdue tasks
-    const isOverdue = task.dueDate && !task.completed && new Date(task.dueDate) < now;
-    if (isOverdue) {
-      li.style.borderLeft = "4px solid #f44336"; // Red left border for overdue
+    // Mark overdue with red border if due date passed & not completed
+    if (task.dueDate && !task.completed && new Date(task.dueDate) < now) {
+      li.style.borderLeft = "4px solid #f44336";
+    } else {
+      li.style.borderLeft = "none";
     }
 
-    // Checkbox to mark complete
+    // Checkbox
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.checked = task.completed;
@@ -86,22 +87,23 @@ function renderTasks() {
       taskText.style.color = "gray";
     }
 
-    // Due date display
+    // Due date span
     const dueDateSpan = document.createElement("span");
     dueDateSpan.className = "due-date";
     dueDateSpan.textContent = task.dueDate ? new Date(task.dueDate).toLocaleDateString() : "";
 
-    // Priority display with color coding
+    // Priority span with color
     const prioritySpan = document.createElement("span");
     prioritySpan.className = "priority";
     prioritySpan.textContent = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
+
     if (task.priority === "high") {
-      prioritySpan.style.color = "#d32f2f";
+      prioritySpan.style.color = "#d32f2f"; // red
       prioritySpan.style.fontWeight = "bold";
     } else if (task.priority === "medium") {
-      prioritySpan.style.color = "#f57c00";
+      prioritySpan.style.color = "#f57c00"; // orange
     } else {
-      prioritySpan.style.color = "#388e3c";
+      prioritySpan.style.color = "#388e3c"; // green
     }
 
     // Delete button
@@ -114,6 +116,7 @@ function renderTasks() {
       renderTasks();
     });
 
+    // Append elements
     li.appendChild(checkbox);
     li.appendChild(taskText);
     li.appendChild(dueDateSpan);
@@ -124,7 +127,7 @@ function renderTasks() {
   });
 }
 
-// Add a new task
+// Add new task
 function addTask() {
   const text = taskInput.value.trim();
   if (!text) {
@@ -144,7 +147,6 @@ function addTask() {
   saveTasks();
   renderTasks();
 
-  // Clear inputs
   taskInput.value = "";
   dueDateInput.value = "";
   prioritySelect.value = "medium";
@@ -160,23 +162,20 @@ function clearAllTasks() {
   }
 }
 
-// Toggle dark/light mode
+// Toggle theme
 function toggleTheme() {
   const isDark = document.body.classList.toggle("dark-mode");
   saveTheme(isDark);
   themeToggle.textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
 }
 
-// Setup event listeners
+// Setup listeners
 function setupEventListeners() {
   addTaskBtn.addEventListener("click", addTask);
-
   taskInput.addEventListener("keypress", e => {
     if (e.key === "Enter") addTask();
   });
-
   clearAllBtn.addEventListener("click", clearAllTasks);
-
   themeToggle.addEventListener("click", toggleTheme);
 }
 
@@ -189,3 +188,4 @@ function init() {
 }
 
 init();
+
