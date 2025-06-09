@@ -6,7 +6,7 @@ const taskList = document.getElementById("task-list");
 const clearAllBtn = document.getElementById("clear-all-btn");
 const themeToggle = document.getElementById("theme-toggle");
 
-// Load dark mode preference
+// Load dark mode preference from localStorage
 function loadTheme() {
   const darkMode = localStorage.getItem("darkMode") === "enabled";
   if (darkMode) {
@@ -18,14 +18,14 @@ function loadTheme() {
   }
 }
 
-// Toggle dark mode
+// Toggle dark mode and update localStorage
 themeToggle.addEventListener("click", () => {
   const isDark = document.body.classList.toggle("dark-mode");
   localStorage.setItem("darkMode", isDark ? "enabled" : "disabled");
   themeToggle.textContent = isDark ? "Light Mode" : "Dark Mode";
 });
 
-// Add task
+// Add a new task to the list
 function addTask() {
   const taskText = taskInput.value.trim();
   const dueDate = dueDateInput.value;
@@ -58,26 +58,28 @@ function addTask() {
   taskInput.focus();
 }
 
+// Add task on button click
+addTaskBtn.addEventListener("click", addTask);
+
+// Add task on Enter key press
+taskInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") addTask();
+});
+
 // Clear all tasks
 clearAllBtn.addEventListener("click", () => {
   taskList.innerHTML = "";
 });
 
-// Add task on button click
-addTaskBtn.addEventListener("click", addTask);
-
-// Add task on Enter key
-taskInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") addTask();
-});
-
-// Initialize theme
+// Load initial theme preference
 loadTheme();
-// Register service worker
+
+// ✅ Register service worker for PWA support
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('service-worker.js')
       .then(reg => console.log("✅ Service Worker registered!", reg))
-      .catch(err => console.error("❌ Service Worker failed: ", err));
+      .catch(err => console.error("❌ Service Worker registration failed:", err));
   });
 }
+
