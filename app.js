@@ -1,61 +1,56 @@
-// DOM Elements
-const addTaskBtn = document.getElementById("add-task-btn");
 const taskInput = document.getElementById("task-input");
 const dueDateInput = document.getElementById("due-date-input");
 const prioritySelect = document.getElementById("priority-select");
+const addTaskBtn = document.getElementById("add-task-btn");
 const taskList = document.getElementById("task-list");
 const clearAllBtn = document.getElementById("clear-all-btn");
 const themeToggle = document.getElementById("theme-toggle");
-const container = document.querySelector(".container");
 
-// Load saved tasks and theme from localStorage
-let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-let darkMode = localStorage.getItem("darkMode") === "true";
-
-// Render tasks to the list
-function renderTasks() {
-  taskList.innerHTML = "";
-  if (tasks.length === 0) {
-    taskList.innerHTML = "<li>No tasks yet! Add one above.</li>";
-    clearAllBtn.disabled = true;
-    return;
+// Load dark mode preference
+function loadTheme() {
+  const darkMode = localStorage.getItem("darkMode") === "enabled";
+  if (darkMode) {
+    document.body.classList.add("dark-mode");
+    themeToggle.textContent = "Light Mode";
+  } else {
+    document.body.classList.remove("dark-mode");
+    themeToggle.textContent = "Dark Mode";
   }
-  clearAllBtn.disabled = false;
-
-  tasks.forEach((task, index) => {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <strong>${task.text}</strong>
-      <span>Due: ${task.dueDate || "N/A"}</span>
-      <span>Priority: ${task.priority}</span>
-      <button class="delete-btn" data-index="${index}">Delete</button>
-    `;
-    taskList.appendChild(li);
-  });
 }
 
-// Save tasks to localStorage
-function saveTasks() {
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-}
+// Toggle dark mode
+themeToggle.addEventListener("click", () => {
+  const isDark = document.body.classList.toggle("dark-mode");
+  localStorage.setItem("darkMode", isDark ? "enabled" : "disabled");
+  themeToggle.textContent = isDark ? "Light Mode" : "Dark Mode";
+});
 
-// Add a new task
+// Add task
 function addTask() {
-  const text = taskInput.value.trim();
-  if (!text) {
-    alert("Please enter a task.");
-    return;
-  }
+  const taskText = taskInput.value.trim();
+  const dueDate = dueDateInput.value;
+  const priority = prioritySelect.value;
 
-  const newTask = {
-    text,
-    dueDate: dueDateInput.value,
-    priority: prioritySelect.value,
-  };
+  if (taskText === "") return;
 
-  tasks.push(newTask);
-  saveTasks();
-  renderTasks();
+  const li = document.createElement("li");
+  li.className = "task-item";
+
+  const infoDiv = document.createElement("div");
+  infoDiv.className = "task-info";
+  infoDiv.innerHTML = `<strong>${taskText}</strong><br>
+    <span class="task-meta">📅 ${dueDate || "No date"} | 🔥 ${priority}</span>`;
+
+  const deleteBtn = document.createElement("button");
+  deleteBtn.className = "delete-btn";
+  deleteBtn.textContent = "Delete";
+  deleteBtn.addEventListener("click", () => {
+    taskList.removeChild(li);
+  });
+
+  li.appendChild(infoDiv);
+  li.appendChild(deleteBtn);
+  taskList.appendChild(li);
 
   taskInput.value = "";
   dueDateInput.value = "";
@@ -63,65 +58,19 @@ function addTask() {
   taskInput.focus();
 }
 
-// Delete a single task
-function deleteTask(index) {
-  tasks.splice(index, 1);
-  saveTasks();
-  renderTasks();
-}
-
 // Clear all tasks
-function clearAllTasks() {
-  if (confirm("Are you sure you want to clear all tasks?")) {
-    tasks = [];
-    saveTasks();
-    renderTasks();
-  }
-}
+clearAllBtn.addEventListener("click", () => {
+  taskList.innerHTML = "";
+});
 
-// Toggle dark mode
-function toggleDarkMode() {
-  darkMode = !darkMode;
-  if (darkMode) {
-    container.classList.add("dark");
-    themeToggle.textContent = "Light Mode";
-  } else {
-    container.classList.remove("dark");
-    themeToggle.textContent = "Dark Mode";
-  }
-  localStorage.setItem("darkMode", darkMode);
-}
-
-// Initial setup
-function init() {
-  renderTasks();
-
-  if (darkMode) {
-    container.classList.add("dark");
-    themeToggle.textContent = "Light Mode";
-  } else {
-    container.classList.remove("dark");
-    themeToggle.textContent = "Dark Mode";
-  }
-}
-
-// Event Listeners
+// Add task on button click
 addTaskBtn.addEventListener("click", addTask);
 
-taskInput.addEventListener("keypress", (e) => {
+// Add task on Enter key
+taskInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") addTask();
 });
 
-taskList.addEventListener("click", (e) => {
-  if (e.target.classList.contains("delete-btn")) {
-    const index = e.target.getAttribute("data-index");
-    deleteTask(index);
-  }
-});
-
-clearAllBtn.addEventListener("click", clearAllTasks);
-themeToggle.addEventListener("click", toggleDarkMode);
-
-// Run on page load
-init();
+// Initialize theme
+loadTheme();
 
