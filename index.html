@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>To-Do List App</title>
 
   <!-- Meta + PWA -->
-  <meta name="theme-color" content="#4CAF50">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="ToDoApp">
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+  <meta name="theme-color" content="#4CAF50" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="ToDoApp" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <link rel="apple-touch-icon" href="icons/icon-192x192.png" />
 
   <!-- CSS -->
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="container">
@@ -23,8 +23,14 @@
     <button id="theme-toggle" class="theme-btn" aria-label="Toggle dark mode">🌙 Dark Mode</button>
 
     <div class="input-group">
-      <input type="text" id="task-input" placeholder="Add a task" aria-label="Task description" autofocus>
-      <input type="date" id="due-date-input" aria-label="Due date (optional)">
+      <input
+        type="text"
+        id="task-input"
+        placeholder="Add a task"
+        aria-label="Task description"
+        autofocus
+      />
+      <input type="date" id="due-date-input" aria-label="Due date (optional)" />
       <select id="priority-input" aria-label="Select task priority">
         <option value="low">Low</option>
         <option value="medium" selected>Medium</option>
